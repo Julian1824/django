@@ -1,0 +1,37 @@
+version: "3.9"
+ 
+services:
+  api:
+    build: /dev
+    working_dir: /api
+    container_name: 'coffeShop'
+    stdin_open: true
+    tty: true
+    command: python manage.py runserver 0.0.0.0:8000 # --settings=e_survey.settings_develop
+    ports:
+      - "8000:8000"
+    volumes: # is no too necesary in prod. environment
+      - .:/api
+    environment:
+      - DJANGO_DEBUG=True
+  # this service will use same image, and once the migration is done it will be stopped
+    # web_migrations:
+    #   build: .
+    #   command: ./manage.py migrate
+    depends_on:
+      - db 
+
+  db:
+    image: postgres:14  # Asegúrate de tener la imagen de PostgreSQL configurada
+    container_name: 'coffeeShop-db'
+    environment:
+      POSTGRES_DB: coffee_shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
